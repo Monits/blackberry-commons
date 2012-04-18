@@ -1,0 +1,7 @@
+deliverables
+bin
+.classpath
+*Thumbs.db
+.preprocessed
+.settings
+.project
