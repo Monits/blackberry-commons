@@ -14,6 +14,7 @@ public class ServiceLocator {
 		services.put(ImageResizeService.class, new ImageResizeServiceImpl());
 		services.put(ResourceService.class, new ResourceServiceImpl());
 		services.put(ScreenTypeService.class, new ScreenTypeServiceImpl());
+		services.put(LocationService.class, new LocationServiceImpl());
 	}
 	
 	public static ImageResizeService getImageResizeService() {
@@ -26,5 +27,9 @@ public class ServiceLocator {
 
 	public static ScreenTypeService getScreenTypeService() {
 		return (ScreenTypeService) services.get(ScreenTypeService.class);
+	}
+
+	public static LocationService getLocationService() {
+		return (LocationService) services.get(LocationService.class);
 	}
 }
