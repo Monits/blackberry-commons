@@ -211,75 +211,11 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			Logger.logEventInfo(getResponseToLog(rc,c).toString());
 
 			if (rc != HttpConnection.HTTP_OK) {
-				// We stop here - but try to give the user (and log) something useful.  
-				String errorMessage;
-				if ( rc < 300 ) {
-					// Processed without error, but why not OK?
-					errorMessage = "Request not completed - try later. Code: " + rc + ".";
-				} else
-				if ( rc < 400 ) {
-					// Redirection, which should be handled....
-					// Should update the requested address with a new one?
-					errorMessage = "Requested address has changed - contact support. Code: " + rc + ".";
-				} else
-				if ( rc < 500 ) {
-					// We did something wrong? Most commonly Server not up....
-					errorMessage = "Request not understood - try later. Code: " + rc + ".";
-				} else
-				if ( rc < 600 ) {
-					// Server error...
-					errorMessage = "Processing Error - try later. Code: " + rc + ".";
-				} else {
-					errorMessage = "Unexpected HTTP response - try later. Code: " + rc + ".";
-				}
-				
-				Logger.logEventError(errorMessage);
-				Logger.logEventError(_connectionURL);
+				logErrorMessage(rc);
 				return;
 			}
 
-			processStatus("Response Received");
-			is = c.openInputStream();
-
-			// Get the ContentType in case the User wants to know
-			_contentType = c.getType();
-
-			// Get the length and process the data
-			int len = (int)c.getLength();
-			byte [] response;
-			int bytesRead;
-			if (len > 0) {
-				// Length supplied - just read that amount
-				int actual = 0;
-				bytesRead = 0 ;
-				response = new byte[len];
-				// We have found reading it in one go doesn't work as well as the following
-				while ((bytesRead != len) && (actual != -1)) {
-					actual = is.read(response, bytesRead, len - bytesRead);
-					bytesRead += actual;
-				}
-			} else {
-				// No length supplied - read until EOF
-				response = IOUtilities.streamToBytes(is);
-				bytesRead = response.length;
-			}
-
-			String encoding = c.getEncoding();
-
-			if (encoding == null) {
-				StringMatch matcher = new StringMatch(CHARSET, false);
-				String contentType = c.getHeaderField(CONTENT_TYPE_HEADER);
-				
-				int pos = matcher.indexOf(contentType);
-				if (pos >= 0) {
-					encoding = contentType.substring(pos + CHARSET.length());
-				}
-			}
-
-			// now have, in response byte array, the data that we have received
-			Logger.logEventInfo("Response (" + Integer.toString(response.length) + ")");
-			Logger.logEventInfo(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
-			returnResponse(response, encoding);
+			is = processResponse(c);
 
 		} catch (Exception e) {
 			String exMsg = "Unexpected Exception Receiving Response - try later.";
@@ -303,6 +239,90 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			} catch ( IOException ioe ) {
 			}
 		}
+	}
+
+	/**
+	 * Processes the response.
+	 * @param c Connection to the server.
+	 * @return is Response input
+	 * @throws IOException
+	 */
+	private InputStream processResponse(HttpConnection c) throws IOException {
+		InputStream is;
+		processStatus("Response Received");
+		is = c.openInputStream();
+
+		// Get the ContentType in case the User wants to know
+		_contentType = c.getType();
+
+		// Get the length and process the data
+		int len = (int)c.getLength();
+		byte [] response;
+		int bytesRead;
+		if (len > 0) {
+			// Length supplied - just read that amount
+			int actual = 0;
+			bytesRead = 0 ;
+			response = new byte[len];
+			// We have found reading it in one go doesn't work as well as the following
+			while ((bytesRead != len) && (actual != -1)) {
+				actual = is.read(response, bytesRead, len - bytesRead);
+				bytesRead += actual;
+			}
+		} else {
+			// No length supplied - read until EOF
+			response = IOUtilities.streamToBytes(is);
+			bytesRead = response.length;
+		}
+
+		String encoding = c.getEncoding();
+
+		if (encoding == null) {
+			StringMatch matcher = new StringMatch(CHARSET, false);
+			String contentType = c.getHeaderField(CONTENT_TYPE_HEADER);
+			
+			int pos = matcher.indexOf(contentType);
+			if (pos >= 0) {
+				encoding = contentType.substring(pos + CHARSET.length());
+			}
+		}
+
+		// now have, in response byte array, the data that we have received
+		Logger.logEventInfo("Response (" + Integer.toString(response.length) + ")");
+		Logger.logEventInfo(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
+		returnResponse(response, encoding);
+		return is;
+	}
+
+	/**
+	 * According to an error code, this method log a proper message.
+	 * @param rc Response code.
+	 */
+	private void logErrorMessage(int rc) {
+		// We stop here - but try to give the user (and log) something useful.  
+		String errorMessage;
+		if ( rc < 300 ) {
+			// Processed without error, but why not OK?
+			errorMessage = "Request not completed - try later. Code: " + rc + ".";
+		} else
+		if ( rc < 400 ) {
+			// Redirection, which should be handled....
+			// Should update the requested address with a new one?
+			errorMessage = "Requested address has changed - contact support. Code: " + rc + ".";
+		} else
+		if ( rc < 500 ) {
+			// We did something wrong? Most commonly Server not up....
+			errorMessage = "Request not understood - try later. Code: " + rc + ".";
+		} else
+		if ( rc < 600 ) {
+			// Server error...
+			errorMessage = "Processing Error - try later. Code: " + rc + ".";
+		} else {
+			errorMessage = "Unexpected HTTP response - try later. Code: " + rc + ".";
+		}
+		
+		Logger.logEventError(errorMessage);
+		Logger.logEventError(_connectionURL);
 	}
 
 	/**
