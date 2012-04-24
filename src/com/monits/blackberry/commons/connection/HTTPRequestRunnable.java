@@ -1,12 +1,19 @@
-package com.monits.blackberry.commons.connection;
-
-/**
- * HTTPRequestRunnable
- * Create a Runnable that will 
- * process the URL supplied and supply the data that the server returns
- * 
- * See Constructor for more details
+/*
+ * Copyright 2012 Monits
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package com.monits.blackberry.commons.connection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +32,13 @@ import com.monits.blackberry.commons.Logger;
 import com.thirdparty.connectivity.HttpConnectionFactory;
 import com.thirdparty.connectivity.NoMoreTransportsException;
 
+/**
+ * HTTPRequestRunnable
+ * Create a Runnable that will 
+ * process the URL supplied and supply the data that the server returns
+ * 
+ * See Constructor for more details
+ */
 public class HTTPRequestRunnable extends Object implements Runnable {
 	public static final int POST = 1;
 	public static final int GET = 2;
@@ -33,14 +47,10 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 
 	private static final String CHARSET = "charset=";
 	
-	private boolean _gotResponse; // Have we got a response from the Server?
-	// Only used in case a caller wishes to query it
-
 	private String _connectionURL = null; // Actual connection
 
 	private URLEncodedPostData _parameters;
 
-	private String _status = null;
 	private String _errorMessage = null;
 	private byte [] _response = null;
 	private String _contentType = null;
@@ -53,7 +63,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 	/**
 	 * This utility class handles GETs and POSTs, via HTTP and HTTPS,
 	 * with various connection methods and options
-	 * and will even cope with Basic Authentication, adn running in the background.
+	 * and will even cope with Basic Authentication, and running in the background.
 	 * This means it is actually a bit complicated, sorry about that...
 	 * 
 	 * An HTTP Request is created with these parameters
@@ -64,23 +74,14 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 		super();
 		_connectionURL = targetURL;
 		_parameters = parameters;
-		_gotResponse = false;
 		_response = null;
-	}
-	
-	/**
-	 * external check on whether a response has arrived
-	 * @return true if response has arrived.
-	 */
-	public boolean gotResponse() {
-		return _gotResponse;
 	}
 
 	/**
 	 * return response
 	 * @return data bytes
 	 */
-	public byte [] getResponse() {
+	public byte[] getResponse() {
 		return _response;
 	}
 	
@@ -89,6 +90,10 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 	 * @return The response as string using the proper encoding.
 	 */
 	public String getResponseAsString() {
+		if (_response == null) {
+			return null;
+		}
+		
 		try {
 			return new String(_response, _encoding);
 		} catch (UnsupportedEncodingException e) {
@@ -106,7 +111,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 
 	/**
 	 * get Connection URL used
-	 * @return full connnection URL used
+	 * @return full connection URL used
 	 */
 	public String getConnectionURL() {
 		return _connectionURL;
@@ -131,7 +136,6 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 	public void run () {
 		HttpConnection c = null;
 		InputStream is = null;
-		processStatus("Start of Request processing");
 		boolean tryAgain = false;
 		OutputStream os = null;
 		int rc = -1;
@@ -141,7 +145,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			
 			do {
 				tryAgain = false;
-				Logger.logEventInfo("Contacting: " + _connectionURL + ".");
+				Logger.info("Contacting: " + _connectionURL + ".");
 				
 				String url = _connectionURL;
 				
@@ -160,7 +164,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 							c.setRequestProperty(HttpProtocolConstants.HEADER_CONTENT_TYPE, _parameters.getContentType());
 							// Now create our 'posting' stuff
 							byte [] postBytes = _parameters.getBytes();
-							Logger.logEventInfo(new String(postBytes));  // Note assumption post data is UTF-8, it might not be...
+							Logger.info(new String(postBytes));  // Note assumption post data is UTF-8, it might not be...
 							c.setRequestProperty(HttpProtocolConstants.HEADER_CONTENT_LENGTH, Integer.toString(postBytes.length));
 							os = c.openOutputStream();
 							os.write(postBytes);
@@ -177,6 +181,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 						break;
 					default:
 						// ???
+						Logger.error("Unsupported http method " + request);
 						break;
 					}
 					
@@ -190,11 +195,11 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			if ( ioe instanceof InterruptedIOException ) {
 				exMsg = "Message timed out - check connectivity.";
 			}
-			Logger.logEventError(exMsg);
-			Logger.logEventError(ioe.toString() + "\n" + _connectionURL);
+			Logger.error(exMsg);
+			Logger.error(ioe.toString() + "\n" + _connectionURL);
 			return;
 		} catch (NoMoreTransportsException e) {
-			Logger.logEventError(e.toString() + "\n" + _connectionURL);
+			Logger.error(e.toString() + "\n" + _connectionURL);
 			return;
 		} finally {
 			if ( os != null ) {
@@ -208,7 +213,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 
 		try {
 
-			Logger.logEventInfo(getResponseToLog(rc,c).toString());
+			Logger.info(getResponseToLog(rc,c));
 
 			if (rc != HttpConnection.HTTP_OK) {
 				logErrorMessage(rc);
@@ -218,11 +223,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			is = processResponse(c);
 
 		} catch (Exception e) {
-			String exMsg = "Unexpected Exception Receiving Response - try later.";
-			String exceptionMessage = e.toString();
-			Logger.logEventError(exMsg);
-			Logger.logEventError(exceptionMessage + "\n" + _connectionURL);
-			processError(exMsg);
+			Logger.error("Unexpected Exception Receiving Response - try later.");
+			Logger.error(e.toString() + "\n" + _connectionURL);
 		} finally {
 			try {
 				if (is != null) {
@@ -245,11 +247,10 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 	 * Processes the response.
 	 * @param c Connection to the server.
 	 * @return is Response input
-	 * @throws IOException
+	 * @throws IOException If an I/O error occurs.
 	 */
 	private InputStream processResponse(HttpConnection c) throws IOException {
 		InputStream is;
-		processStatus("Response Received");
 		is = c.openInputStream();
 
 		// Get the ContentType in case the User wants to know
@@ -275,9 +276,10 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			bytesRead = response.length;
 		}
 
+		// Look for an encoding
 		String encoding = c.getEncoding();
-
 		if (encoding == null) {
+			// Not autodetected, look for a content-type HTTP header
 			StringMatch matcher = new StringMatch(CHARSET, false);
 			String contentType = c.getHeaderField(CONTENT_TYPE_HEADER);
 			
@@ -288,8 +290,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 		}
 
 		// now have, in response byte array, the data that we have received
-		Logger.logEventInfo("Response (" + Integer.toString(response.length) + ")");
-		Logger.logEventInfo(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
+		Logger.info("Response (" + Integer.toString(response.length) + ")");
+		Logger.info(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
 		returnResponse(response, encoding);
 		return is;
 	}
@@ -321,8 +323,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			errorMessage = "Unexpected HTTP response - try later. Code: " + rc + ".";
 		}
 		
-		Logger.logEventError(errorMessage);
-		Logger.logEventError(_connectionURL);
+		Logger.error(errorMessage);
+		Logger.error(_connectionURL);
 	}
 
 	/**
@@ -331,31 +333,15 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 	 * @param encoding The encoding of the reply
 	 */
 	private void returnResponse(byte [] reply, String encoding) {
-		_gotResponse = true;
 		_response = reply;
 		_encoding  = encoding;
 	}
 
 	/**
-	 * Update Status
-	 * @param statusString <description>
+	 * Retrieve a String representation of the byte array.
+	 * @param item Array to parse
+	 * @return Byte array to string.
 	 */
-	private void processStatus(final String statusString) {
-		Logger.logEventInfo("Request status update: " + statusString);
-		_status = statusString;
-	}
-
-	/**
-	 * Advise Error
-	 * @param errorMessage - text that may be displayed
-	 */
-	private void processError(final String errorMessage) {
-		Logger.logEventInfo("Request error: " + errorMessage);
-		_status = "Error";
-		_errorMessage = errorMessage;
-	}
-
-	
 	private String byteToString (byte[] item) {
 		
 		StringBuffer hexString = new StringBuffer();
@@ -375,7 +361,14 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 		
 	}
 
-	private StringBuffer getResponseToLog(int rc, HttpConnection c) throws IOException {
+	/**
+	 * Log response with the corresponding response code.
+	 * @param rc Response code.
+	 * @param c Connection from where to get the response to log
+	 * @return A message containing the response info.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	private String getResponseToLog(int rc, HttpConnection c) throws IOException {
 		
 		 StringBuffer sb = new StringBuffer();
 		 sb.append("Response: " + Integer.toString(rc) + ", " + c.getResponseMessage() + "\n");
@@ -395,9 +388,13 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			 }
 		 }
 		 
-		 return sb;
+		 return sb.toString();
 	}
 
+	/**
+	 * Set the request method. 
+	 * @param request The request method.
+	 */
 	public void setRequest(int request) {
 		this.request = request;
 	}
