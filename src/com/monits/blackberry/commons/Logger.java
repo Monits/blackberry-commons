@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Monits
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monits.blackberry.commons;
 
 import net.rim.device.api.system.DeviceInfo;
@@ -7,63 +22,86 @@ import net.rim.device.api.system.EventLogger;
  * Logger.java
  *
  */
-
 public class Logger {
 
+	public static int LEVEL_DEBUG = EventLogger.DEBUG_INFO;
 	public static int LEVEL_INFO = EventLogger.INFORMATION;
 	public static int LEVEL_WARNING = EventLogger.WARNING;
 	public static int LEVEL_ERROR = EventLogger.ERROR;
 	public static int LEVEL_SEVERE_ERROR = EventLogger.SEVERE_ERROR;
 
+	public static String LOG_PREFIX_DEBUG = "D: ";
 	public static String LOG_PREFIX_INFO = "I: ";
 	public static String LOG_PREFIX_WARN = "W: ";
 	public static String LOG_PREFIX_ERROR = "E: ";
 	public static String LOG_PREFIX_SEVERE = "S: ";
 
-	public static boolean DEBUG = true;
+	// Valid log level.
+	private static int minimumLogLevel = LEVEL_DEBUG;
 
-	// ----------------------------------------------
-	// Shared code
-	// ----------------------------------------------
 	/**
-	 * Debug.
-	 * Not actually used in this project, here in case useful for someone else.
+	 * Log the message with DEBUG level.
+	 * @param eventData Message to log.
 	 */
-	public static void debug(String s) {
-		// output debug for JDE debugging
-		if ( DEBUG ) {
-			System.out.println(s);
-		}
-	}
-
-
-	// -----------------------------------------------------------------------------
-	// Quick Access to Logging.
-
-	public static void logEventInfo(String eventData) {
-		Logger.logEvent(true, Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData);
-	}
-
-	public static void logEventWarn(String eventData) {
-		Logger.logEvent(true, Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData);
-	}
-
-	public static void logEventError(String eventData) {
-		Logger.logEvent(true, Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData);
-	}
-
-	public static void logEventSevere(String eventData) {
-		Logger.logEvent(true, Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData);
+	public static void debug(String eventData) {
+		Logger.logEvent(Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData);
 	}
 
 	/**
-	 * Log Event.
+	 * Log the message with INFO level.
+	 * @param eventData Message to log.
 	 */
-	public static void logEvent(boolean logging, int level, String eventData) {
-		if ( DeviceInfo.isSimulator() ) {
+	public static void info(String eventData) {
+		Logger.logEvent(Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData);
+	}
+
+	/**
+	 * Log the message with WARNING level.
+	 * @param eventData Message to log.
+	 */
+	public static void warn(String eventData) {
+		Logger.logEvent(Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData);
+	}
+
+	/**
+	 * Log the message with ERROR level.
+	 * @param eventData Message to log.
+	 */
+	public static void error(String eventData) {
+		Logger.logEvent(Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData);
+	}
+
+	/**
+	 * Log the message with SEVERE level.
+	 * @param eventData Message to log.
+	 */
+	public static void severe(String eventData) {
+		Logger.logEvent(Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData);
+	}
+
+	/**
+	 * Log an event, with the given level.
+	 * @param level Log level.
+	 * @param eventData Message to log.
+	 */
+	private static void logEvent(int level, String eventData) {
+		if ( DeviceInfo.isSimulator() && (minimumLogLevel > level)) {
 			System.out.println(eventData);
 		}
 	}
 
+	/**
+	 * Set the minimum log level
+	 * @param minimumLogLevel the minimum log level.
+	 */
+	public void setMinimumLogLevel(int minimumLogLevel) {
+		Logger.minimumLogLevel = minimumLogLevel;
+	}
 
-} 
+	/**
+	 * @return the minimum log level
+	 */
+	public int getMinimumLogLevel() {
+		return minimumLogLevel;
+	}
+}
