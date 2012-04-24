@@ -1,4 +1,19 @@
-package com.monits.blackberry.commons.services.implementations;
+/*
+ * Copyright 2012 Monits
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.monits.blackberry.commons.service.impl;
 
 import java.util.Vector;
 
@@ -9,9 +24,9 @@ import javax.microedition.location.LocationProvider;
 
 import com.monits.blackberry.commons.Logger;
 import com.monits.blackberry.commons.location.LocationListener;
-import com.monits.blackberry.commons.services.LocationService;
+import com.monits.blackberry.commons.service.LocationService;
 /**
- * Implementation for LocationService
+ * Implementation for {@link LocationService}
  * @author Rodrigo Pereyra
  */
 public class LocationServiceImpl implements LocationService {
@@ -113,16 +128,22 @@ public class LocationServiceImpl implements LocationService {
 	 */
 	public LocationServiceImpl(int[] gpsModeAlternatives){
 		for(int i = 0; i < gpsModeAlternatives.length; i++) {
-			if(setGpsMode(gpsModeAlternatives[i]) != null){
-				GPS_MODE = gpsModeAlternatives[i];
+			LocationProvider lp;
+			try {
+				lp = LocationProvider.getInstance(setGpsMode((gpsModeAlternatives[i])));
+				if(lp != null){
+					GPS_MODE = gpsModeAlternatives[i];
+					locationProvider = lp;
+				}
+			} catch (LocationException e) {
+				Logger.error("Error trying to inititate the location service. Most likely unavailable.");
 			}
 		}
 
 		listeners = new Vector();
 		lastLocation = null;
 		started = false;
-		locationProvider = null;
-		
+
 		start();
 	}
 
@@ -170,8 +191,7 @@ public class LocationServiceImpl implements LocationService {
 		}
 		
 		try {
-			locationProvider = LocationProvider.getInstance(setGpsMode(GPS_MODE));
-			
+
 			locationProvider.setLocationListener(new javax.microedition.location.LocationListener() {
 
 				public void providerStateChanged(LocationProvider provider,
@@ -200,12 +220,12 @@ public class LocationServiceImpl implements LocationService {
 				// The API is pretty crappy and takes 30 secs to give the first fix, but this is almost instantaneous...
 				lastLocation = locationProvider.getLocation(5);
 			} catch (InterruptedException e) {
-				Logger.logEventError("Failed to get a first location due to interruption. " + e.getMessage());
+				Logger.error("Failed to get a first location due to interruption. " + e.getMessage());
 			}
 			
 			started = true;
 		} catch (LocationException e) {
-			Logger.logEventError("Failed to get a location provider. " + e.getMessage());
+			Logger.error("Failed to get a location provider. " + e.getMessage());
 		}
 	}
 
