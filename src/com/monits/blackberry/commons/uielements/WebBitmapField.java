@@ -1,22 +1,36 @@
+/*
+ * Copyright 2012 Monits
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monits.blackberry.commons.uielements;
 
-import java.io.InputStream;
 import java.util.Hashtable;
-
-import javax.microedition.io.HttpConnection;
 
 import net.rim.device.api.system.Application;
 import net.rim.device.api.system.EncodedImage;
 import net.rim.device.api.ui.component.BitmapField;
 
+import com.monits.blackberry.commons.Logger;
+import com.monits.blackberry.commons.service.ConnectionService;
+import com.monits.blackberry.commons.service.ServiceLocator;
+import com.monits.blackberry.commons.service.request.RequestHandler;
 import com.monits.blackberry.commons.uielements.listener.StateChangeListener;
-import com.thirdparty.connectivity.HttpConnectionFactory;
 
 /**
  * Class that get an image from a web and display it.
  */
 public class WebBitmapField extends BitmapField {
-	private static final int BUFFER_SIZE = 10000;
 
 	// TODO : Replace cache with a local persistent storage?
 	private static final Hashtable cache = new Hashtable();
@@ -44,76 +58,67 @@ public class WebBitmapField extends BitmapField {
 				return;
 			}
 		}
-		
-		new Thread(
-			new Runnable() {
-				public void run() {
-					HttpConnectionFactory factory = new HttpConnectionFactory(url);
-					try {
-						HttpConnection connection = factory.getNextConnection();
-						InputStream inputStream = connection.openInputStream();
-						
-						if (connection.getResponseCode() == HttpConnection.HTTP_OK) {
-							byte[] responseData = new byte[BUFFER_SIZE];
-							int length;
-							StringBuffer rawResponse = new StringBuffer();
-							try {
-								while (-1 != (length = inputStream.read(responseData))) {
-									rawResponse.append(new String(responseData, 0, length));
-								}
-							} catch (Exception e) {
-								// Ignore it, older devices throw connection closed exceptions instead of returning -1 when EOF reached..
-							}
-						
-							byte[] dataArray = rawResponse.toString().getBytes();
-							bitmap = EncodedImage.createEncodedImage(dataArray, 0,
-									dataArray.length);
-							
-							synchronized (cache) {
-								cache.put(url, bitmap);
-							}
-							
-							synchronized (Application.getEventLock()) {
-								setImage(bitmap);
-								invalidate();
-							}
-							setState(STATE_LOADED);
-						} else {
-							setState(STATE_FAILED);
-						}
-					} catch (Exception e) {
-						setState(STATE_FAILED);
-					}
+
+		ConnectionService cs = ServiceLocator.getConnectionService();
+		cs.executeAsyncGet(url, new RequestHandler() {
+
+			public void onSuccess(String response, int responseCode) {
+
+				Logger.debug("Reading the server response.");
+				byte[] dataArray = response.toString().getBytes();
+				bitmap = EncodedImage.createEncodedImage(dataArray, 0, dataArray.length);
+
+				synchronized (cache) {
+					cache.put(url, bitmap);
 				}
+
+				synchronized (Application.getEventLock()) {
+					Logger.debug("Displaying the image.");
+					setImage(bitmap);
+					invalidate();
+				}
+				setState(STATE_LOADED);
 			}
-		).start();
+
+			public void onFailure(String message) {
+				Logger.warn("The image request has failed. Make sure the URL is correct.");
+				setState(STATE_FAILED);
+			}
+
+			public void onError(Throwable t) {
+				Logger.error("An error ocurrs while trying to get the image.\n");
+				Logger.error(t.getMessage());
+				setState(STATE_FAILED);
+			}
+
+		});
 	}
-	
+
 	/**
 	 * @return The image
 	 */
 	public EncodedImage getImage() {
 		return bitmap;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.rim.device.api.ui.Field#getState()
 	 */
 	public int getState() {
 		return state;
 	}
-	
+
 	/**
 	 * Set a {@link StateChangeListener}
 	 * @param listener New state listener
 	 */
 	public void setStateChangeListener(StateChangeListener listener) {
 		this.listener = listener;
-		
+
 		// trigger an update immediately!
 		setState(state);
 	}
-	
+
 	/**
 	 * Set the state of the field.
 	 * @param state New state.
