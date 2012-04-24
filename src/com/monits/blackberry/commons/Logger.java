@@ -44,7 +44,16 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public static void debug(String eventData) {
-		Logger.logEvent(Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData);
+		Logger.logEvent(Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData, null);
+	}
+
+	/**
+	 * Log the message and the stack trace of the Throwable with DEBUG level.
+	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
+	 */
+	public static void debug(String eventData, Throwable t) {
+		Logger.logEvent(Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData, t);
 	}
 
 	/**
@@ -52,7 +61,16 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public static void info(String eventData) {
-		Logger.logEvent(Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData);
+		Logger.logEvent(Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData, null);
+	}
+
+	/**
+	 * Log the message and the stack trace of the Throwable with INFO level.
+	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
+	 */
+	public static void info(String eventData, Throwable t) {
+		Logger.logEvent(Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData, t);
 	}
 
 	/**
@@ -60,7 +78,17 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public static void warn(String eventData) {
-		Logger.logEvent(Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData);
+		Logger.logEvent(Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData, null);
+	}
+
+
+	/**
+	 * Log the message and the stack trace of the Throwable with WARNING level.
+	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
+	 */
+	public static void warn(String eventData, Throwable t) {
+		Logger.logEvent(Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData, t);
 	}
 
 	/**
@@ -68,7 +96,16 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public static void error(String eventData) {
-		Logger.logEvent(Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData);
+		Logger.logEvent(Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData, null);
+	}
+
+	/**
+	 * Log the message and the stack trace of the Throwable with ERROR level.
+	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
+	 */
+	public static void error(String eventData, Throwable t) {
+		Logger.logEvent(Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData, t);
 	}
 
 	/**
@@ -76,17 +113,31 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public static void severe(String eventData) {
-		Logger.logEvent(Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData);
+		Logger.logEvent(Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData, null);
 	}
 
 	/**
-	 * Log an event, with the given level.
+	 * Log the message and the stack trace of the Throwable with SEVERE level.
+	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
+	 */
+	public static void severe(String eventData, Throwable t) {
+		Logger.logEvent(Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData, t);
+	}
+
+	/**
+	 * Log an event and it's Throwable, with the given level.
 	 * @param level Log level.
 	 * @param eventData Message to log.
+	 * @param t The exception to log, including its stack trace.
 	 */
-	private static void logEvent(int level, String eventData) {
-		if ( DeviceInfo.isSimulator() && (minimumLogLevel > level)) {
-			System.out.println(eventData);
+	private static void logEvent(int level, String eventData, Throwable t) {
+		if (DeviceInfo.isSimulator() && (minimumLogLevel >= level)) {	
+			if (t == null) {
+				System.out.println(eventData);
+				return;
+			}
+			System.out.println(eventData + ": \n" + t.toString());
 		}
 	}
 
