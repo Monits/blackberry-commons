@@ -22,8 +22,8 @@ import javax.microedition.location.Location;
 import javax.microedition.location.LocationException;
 import javax.microedition.location.LocationProvider;
 
-import com.monits.blackberry.commons.Logger;
 import com.monits.blackberry.commons.location.LocationListener;
+import com.monits.blackberry.commons.logger.Logger;
 import com.monits.blackberry.commons.service.LocationService;
 /**
  * Implementation for {@link LocationService}

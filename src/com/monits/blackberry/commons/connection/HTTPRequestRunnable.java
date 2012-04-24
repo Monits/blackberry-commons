@@ -28,7 +28,7 @@ import net.rim.device.api.io.IOUtilities;
 import net.rim.device.api.io.http.HttpProtocolConstants;
 import net.rim.device.api.util.StringMatch;
 
-import com.monits.blackberry.commons.Logger;
+import com.monits.blackberry.commons.logger.Logger;
 import com.thirdparty.connectivity.HttpConnectionFactory;
 import com.thirdparty.connectivity.NoMoreTransportsException;
 

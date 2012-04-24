@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.monits.blackberry.commons;
+package com.monits.blackberry.commons.logger;
 
-import net.rim.device.api.system.DeviceInfo;
+import java.util.Vector;
+
 import net.rim.device.api.system.EventLogger;
 
 /*
@@ -24,21 +25,22 @@ import net.rim.device.api.system.EventLogger;
  */
 public class Logger {
 
-	public static int LEVEL_DEBUG = EventLogger.DEBUG_INFO;
-	public static int LEVEL_INFO = EventLogger.INFORMATION;
-	public static int LEVEL_WARNING = EventLogger.WARNING;
-	public static int LEVEL_ERROR = EventLogger.ERROR;
-	public static int LEVEL_SEVERE_ERROR = EventLogger.SEVERE_ERROR;
+	public static final int LEVEL_DEBUG = EventLogger.DEBUG_INFO;
+	public static final int LEVEL_INFO = EventLogger.INFORMATION;
+	public static final int LEVEL_WARNING = EventLogger.WARNING;
+	public static final int LEVEL_ERROR = EventLogger.ERROR;
+	public static final int LEVEL_SEVERE_ERROR = EventLogger.SEVERE_ERROR;
 
-	public static String LOG_PREFIX_DEBUG = "D: ";
-	public static String LOG_PREFIX_INFO = "I: ";
-	public static String LOG_PREFIX_WARN = "W: ";
-	public static String LOG_PREFIX_ERROR = "E: ";
-	public static String LOG_PREFIX_SEVERE = "S: ";
+	public static final String LOG_PREFIX_DEBUG = "D: ";
+	public static final String LOG_PREFIX_INFO = "I: ";
+	public static final String LOG_PREFIX_WARN = "W: ";
+	public static final String LOG_PREFIX_ERROR = "E: ";
+	public static final String LOG_PREFIX_SEVERE = "S: ";
 
 	// Valid log level.
 	private static int minimumLogLevel = LEVEL_DEBUG;
 
+	private static Vector appenders = new Vector();
 	/**
 	 * Log the message with DEBUG level.
 	 * @param eventData Message to log.
@@ -126,18 +128,37 @@ public class Logger {
 	}
 
 	/**
-	 * Log an event and it's Throwable, with the given level.
+	 * Log an event and its Throwable, with the given level.
 	 * @param level Log level.
 	 * @param eventData Message to log.
 	 * @param t The exception to log, including its stack trace.
 	 */
 	private static void logEvent(int level, String eventData, Throwable t) {
-		if (DeviceInfo.isSimulator() && (minimumLogLevel >= level)) {	
-			if (t == null) {
-				System.out.println(eventData);
-				return;
+		String prefix = null;
+		switch (level) {
+			case LEVEL_DEBUG:
+				prefix = LOG_PREFIX_DEBUG;
+				break;
+			case LEVEL_INFO:
+				prefix = LOG_PREFIX_INFO;
+				break;
+			case LEVEL_WARNING:
+				prefix = LOG_PREFIX_WARN;
+				break;
+			case LEVEL_ERROR:
+				prefix = LOG_PREFIX_ERROR;
+				break;
+			case LEVEL_SEVERE_ERROR:
+				prefix = LOG_PREFIX_SEVERE;
+				break;
+		}
+
+		if (minimumLogLevel >= level) {
+			// Call all the appender to log the event.
+			for (int i = 0; i < appenders.size(); i++) {
+				Appender appender = (Appender) appenders.elementAt(i);
+				appender.logEvent(prefix, level, eventData, t);
 			}
-			System.out.println(eventData + ": \n" + t.toString());
 		}
 	}
 
@@ -145,14 +166,22 @@ public class Logger {
 	 * Set the minimum log level
 	 * @param minimumLogLevel the minimum log level.
 	 */
-	public void setMinimumLogLevel(int minimumLogLevel) {
+	public static void setMinimumLogLevel(int minimumLogLevel) {
 		Logger.minimumLogLevel = minimumLogLevel;
 	}
 
 	/**
 	 * @return the minimum log level
 	 */
-	public int getMinimumLogLevel() {
+	public static int getMinimumLogLevel() {
 		return minimumLogLevel;
+	}
+
+	/**
+	 * Add a new appender.
+	 * @param newAppender New appender.
+	 */
+	public static void addAppender(Appender newAppender) {
+		appenders.addElement(newAppender);
 	}
 }

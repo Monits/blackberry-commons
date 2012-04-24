@@ -21,7 +21,7 @@ import net.rim.device.api.system.Application;
 import net.rim.device.api.system.EncodedImage;
 import net.rim.device.api.ui.component.BitmapField;
 
-import com.monits.blackberry.commons.Logger;
+import com.monits.blackberry.commons.logger.Logger;
 import com.monits.blackberry.commons.service.ConnectionService;
 import com.monits.blackberry.commons.service.ServiceLocator;
 import com.monits.blackberry.commons.service.request.RequestHandler;
