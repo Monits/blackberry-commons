@@ -24,7 +24,7 @@ import net.rim.device.api.ui.Font;
  * @author Rodrigo Pereyra
  *
  */
-public class StringsUtils {
+public class StringUtils {
 
 	/**
 	 * This method wrap a string in function of the given width
