@@ -78,4 +78,36 @@ public class StringUtils {
 		
 		return result;
 	}
+
+	/**
+	 * Splits this string around matches of the given char.
+	 * @param string String to split.
+	 * @param splitChar Delimiting char.
+	 * @return Vector containing the expressions that matches with the char.
+	 */
+	public Vector split(String string, char splitChar) {
+		Vector v = new Vector();
+
+		String working = string;
+		int index = working.indexOf(splitChar);
+
+		// Work with the string until there's no more tokens.
+		while (index != -1) {
+			String tmp = "";
+			if (index > 0) {
+				tmp = working.substring(0, index);
+			}
+			v.addElement(tmp);
+
+			working = working.substring(index + 1);
+
+			// Find the next index
+			index = working.indexOf(splitChar);
+		}
+
+		// Add the rest of the working string
+		v.addElement(working);
+
+		return v;
+	}
 }
