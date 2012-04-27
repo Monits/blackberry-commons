@@ -32,6 +32,8 @@ import com.monits.blackberry.commons.uielements.listener.StateChangeListener;
  */
 public class WebBitmapField extends BitmapField {
 
+	public static final Logger logger = Logger.getLogger(WebBitmapField.class);
+
 	// TODO : Replace cache with a local persistent storage?
 	private static final Hashtable cache = new Hashtable();
 
@@ -64,7 +66,7 @@ public class WebBitmapField extends BitmapField {
 
 			public void onSuccess(String response, int responseCode) {
 
-				Logger.debug("Reading the server response.");
+				logger.debug("Reading the server response.");
 				byte[] dataArray = response.toString().getBytes();
 				bitmap = EncodedImage.createEncodedImage(dataArray, 0, dataArray.length);
 
@@ -73,7 +75,7 @@ public class WebBitmapField extends BitmapField {
 				}
 
 				synchronized (Application.getEventLock()) {
-					Logger.debug("Displaying the image.");
+					logger.debug("Displaying the image.");
 					setImage(bitmap);
 					invalidate();
 				}
@@ -81,13 +83,13 @@ public class WebBitmapField extends BitmapField {
 			}
 
 			public void onFailure(String message) {
-				Logger.warn("The image request has failed. Make sure the URL is correct.");
+				logger.warn("The image request has failed. Make sure the URL is correct.");
 				setState(STATE_FAILED);
 			}
 
 			public void onError(Throwable t) {
-				Logger.error("An error ocurrs while trying to get the image.\n");
-				Logger.error(t.getMessage());
+				logger.error("An error ocurrs while trying to get the image.\n");
+				logger.error(t.getMessage());
 				setState(STATE_FAILED);
 			}
 

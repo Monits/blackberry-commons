@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.monits.blackberry.commons.logger;
+package com.monits.blackberry.commons.logger.appender;
 
 /**
  * This interface must be implemented by classes that want to handle outputting events.
@@ -24,12 +24,13 @@ public interface Appender {
 
 	/**
 	 * Log the event message and the info provided by the {@link Throwable} object.
+	 * @param loggerName Logger instance name.
 	 * @param logPrefix logPrefix String representation of log level.
 	 * @param logLevel Log level.
 	 * @param message Proper event info
 	 * @param t Exception to log, including it stack trace.
 	 */
-	public void logEvent(String logPrefix, int logLevel, String message, Throwable t);
+	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t);
 
 	/**
 	 * @return the minimumLogLevel

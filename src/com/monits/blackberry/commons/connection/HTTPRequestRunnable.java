@@ -40,6 +40,9 @@ import com.thirdparty.connectivity.NoMoreTransportsException;
  * See Constructor for more details
  */
 public class HTTPRequestRunnable extends Object implements Runnable {
+
+	public static final Logger logger = Logger.getLogger(HTTPRequestRunnable.class);
+
 	public static final int POST = 1;
 	public static final int GET = 2;
 
@@ -145,7 +148,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			
 			do {
 				tryAgain = false;
-				Logger.info("Contacting: " + _connectionURL + ".");
+				logger.info("Contacting: " + _connectionURL + ".");
 				
 				String url = _connectionURL;
 				
@@ -164,7 +167,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 							c.setRequestProperty(HttpProtocolConstants.HEADER_CONTENT_TYPE, _parameters.getContentType());
 							// Now create our 'posting' stuff
 							byte [] postBytes = _parameters.getBytes();
-							Logger.info(new String(postBytes));  // Note assumption post data is UTF-8, it might not be...
+							logger.info(new String(postBytes));  // Note assumption post data is UTF-8, it might not be...
 							c.setRequestProperty(HttpProtocolConstants.HEADER_CONTENT_LENGTH, Integer.toString(postBytes.length));
 							os = c.openOutputStream();
 							os.write(postBytes);
@@ -181,7 +184,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 						break;
 					default:
 						// ???
-						Logger.error("Unsupported http method " + request);
+						logger.error("Unsupported http method " + request);
 						break;
 					}
 					
@@ -195,11 +198,11 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			if ( ioe instanceof InterruptedIOException ) {
 				exMsg = "Message timed out - check connectivity.";
 			}
-			Logger.error(exMsg);
-			Logger.error(ioe.toString() + "\n" + _connectionURL);
+			logger.error(exMsg);
+			logger.error(ioe.toString() + "\n" + _connectionURL);
 			return;
 		} catch (NoMoreTransportsException e) {
-			Logger.error(e.toString() + "\n" + _connectionURL);
+			logger.error(e.toString() + "\n" + _connectionURL);
 			return;
 		} finally {
 			if ( os != null ) {
@@ -213,7 +216,7 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 
 		try {
 
-			Logger.info(getResponseToLog(rc,c));
+			logger.info(getResponseToLog(rc,c));
 
 			if (rc != HttpConnection.HTTP_OK) {
 				logErrorMessage(rc);
@@ -223,8 +226,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			is = processResponse(c);
 
 		} catch (Exception e) {
-			Logger.error("Unexpected Exception Receiving Response - try later.");
-			Logger.error(e.toString() + "\n" + _connectionURL);
+			logger.error("Unexpected Exception Receiving Response - try later.");
+			logger.error(e.toString() + "\n" + _connectionURL);
 		} finally {
 			try {
 				if (is != null) {
@@ -290,8 +293,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 		}
 
 		// now have, in response byte array, the data that we have received
-		Logger.info("Response (" + Integer.toString(response.length) + ")");
-		Logger.info(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
+		logger.info("Response (" + Integer.toString(response.length) + ")");
+		logger.info(byteToString(response)); // Note assumption response is UTF8 - it might not be ....
 		returnResponse(response, encoding);
 		return is;
 	}
@@ -323,8 +326,8 @@ public class HTTPRequestRunnable extends Object implements Runnable {
 			errorMessage = "Unexpected HTTP response - try later. Code: " + rc + ".";
 		}
 		
-		Logger.error(errorMessage);
-		Logger.error(_connectionURL);
+		logger.error(errorMessage);
+		logger.error(_connectionURL);
 	}
 
 	/**

@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.monits.blackberry.commons.logger;
+package com.monits.blackberry.commons.logger.appender.impl;
+
+import com.monits.blackberry.commons.logger.appender.Appender;
 
 import net.rim.device.api.system.DeviceInfo;
 import net.rim.device.api.system.EventLogger;
@@ -24,13 +26,25 @@ import net.rim.device.api.system.EventLogger;
  *
  */
 public class ConsoleAppender implements Appender {
+
 	private int minimumLogLevel = EventLogger.DEBUG_INFO;
+
+	private String clazzToLog;
+
+	/**
+	 * Constructor.
+	 * @param clazzToLog Name
+	 */
+	public ConsoleAppender(String clazzToLog) {
+		this.clazzToLog = clazzToLog;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.monits.blackberry.commons.logger.Appender#logEvent(int, java.lang.String, java.lang.Throwable)
 	 */
-	public void logEvent(String logPrefix, int logLevel, String message, Throwable t) {
-		if (DeviceInfo.isSimulator() && (minimumLogLevel >= logLevel)) {
+	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t) {
+
+		if (DeviceInfo.isSimulator() && (minimumLogLevel >= logLevel) && loggerName.startsWith(clazzToLog)) {
 			if (t == null) {
 				System.out.println(logPrefix + message);
 				return;
@@ -39,10 +53,16 @@ public class ConsoleAppender implements Appender {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.monits.blackberry.commons.logger.Appender#getMinimumLogLevel()
+	 */
 	public int getMinimumLogLevel() {
 		return minimumLogLevel;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.monits.blackberry.commons.logger.Appender#setMinimumLogLevel(int)
+	 */
 	public void setMinimumLogLevel(int minimumLogLevel) {
 		this.minimumLogLevel = minimumLogLevel;
 	}

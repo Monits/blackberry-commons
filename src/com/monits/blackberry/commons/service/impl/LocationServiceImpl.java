@@ -97,6 +97,8 @@ public class LocationServiceImpl implements LocationService {
 	 */
 	public static final int GPS_MODE_DATA_OPTIMAL = 8;
 
+	public static final Logger logger = Logger.getLogger(LocationServiceImpl.class);
+
 	private static int GPS_MODE;
 
 	private Vector listeners;
@@ -136,7 +138,7 @@ public class LocationServiceImpl implements LocationService {
 					locationProvider = lp;
 				}
 			} catch (LocationException e) {
-				Logger.error("Error trying to inititate the location service. Most likely unavailable.");
+				logger.error("Error trying to inititate the location service. Most likely unavailable.");
 			}
 		}
 
@@ -220,12 +222,12 @@ public class LocationServiceImpl implements LocationService {
 				// The API is pretty crappy and takes 30 secs to give the first fix, but this is almost instantaneous...
 				lastLocation = locationProvider.getLocation(5);
 			} catch (InterruptedException e) {
-				Logger.error("Failed to get a first location due to interruption. " + e.getMessage());
+				logger.error("Failed to get a first location due to interruption. " + e.getMessage());
 			}
 			
 			started = true;
 		} catch (LocationException e) {
-			Logger.error("Failed to get a location provider. " + e.getMessage());
+			logger.error("Failed to get a location provider. " + e.getMessage());
 		}
 	}
 
