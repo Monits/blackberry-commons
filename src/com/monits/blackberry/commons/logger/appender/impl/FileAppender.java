@@ -17,13 +17,15 @@ package com.monits.blackberry.commons.logger.appender.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import com.monits.blackberry.commons.logger.appender.Appender;
-
 import net.rim.device.api.system.EventLogger;
+
+import com.monits.blackberry.commons.logger.appender.Appender;
+import com.monits.blackberry.commons.utils.StringUtils;
 
 /**
  * FileAppender log events to a file in the SD card.
@@ -34,13 +36,13 @@ public class FileAppender implements Appender {
 	private static final String SD_CARD = "file:///SDCard/";
 
 	private String clazzToLog;
-
 	private String filename;
 	private int minimumLogLevel = EventLogger.DEBUG_INFO;
 
 	/**
 	 * Constructor.
 	 * @param filename Name of the log file. If it doesn't exist FileAppender create it with the given name.
+	 * @param clazzToLog Name of the class / package to log.
 	 */
 	public FileAppender(String filename, String clazzToLog) {
 		this.filename = filename;
@@ -53,8 +55,23 @@ public class FileAppender implements Appender {
 	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t) {
 		if ((minimumLogLevel >= logLevel) && loggerName.startsWith(clazzToLog)) {
 			try {
-				FileConnection fc = (FileConnection) Connector.open(SD_CARD
-						+ filename, Connector.READ_WRITE);
+				StringUtils su = new StringUtils();
+				Vector vector = su.split(filename, '/');
+
+				// Check if the file is in a directory.
+				if (vector.size() > 1) {
+					String hierarchy = "";
+					// Exclude the filename.
+					for(int i = 0; i < (vector.size() - 1); i++) {
+						hierarchy += vector.elementAt(i) + "/";
+						FileConnection fc = (FileConnection) Connector.open(SD_CARD + hierarchy, Connector.READ_WRITE);
+						if (!fc.exists()) {
+							fc.mkdir();
+						}
+					}
+				}
+
+				FileConnection fc = (FileConnection) Connector.open(SD_CARD + filename, Connector.READ_WRITE);
 
 				// The file may or may not exist.
 				if (!fc.exists()) {
@@ -62,18 +79,19 @@ public class FileAppender implements Appender {
 				}
 
 				// Open stream moving cursor to the end of file (AKA append)
-				OutputStream os = fc.openOutputStream(fc.openDataInputStream().available());
+				OutputStream os = fc.openOutputStream(fc.fileSize());
 
 				if (t != null) {
-					os.write((logPrefix + message + "\n" + t.toString()).getBytes());
+					os.write((logPrefix + message + "\n" + t.toString() + "\n").getBytes());
 				} else {
-					os.write((logPrefix + message).getBytes());
+					os.write((logPrefix + message + "\n").getBytes());
 				}
 
 				os.close();
 				fc.close();
 			} catch (IOException ioe) {
 				// Ignore it, we can't log it!
+				System.out.println(ioe.getMessage());
 			}
 		}
 	}
