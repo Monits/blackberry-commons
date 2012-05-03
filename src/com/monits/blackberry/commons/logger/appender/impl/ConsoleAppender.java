@@ -33,7 +33,7 @@ public class ConsoleAppender implements Appender {
 
 	/**
 	 * Constructor.
-	 * @param clazzToLog Name
+	 * @param clazzToLog Name of the class / package to log.
 	 */
 	public ConsoleAppender(String clazzToLog) {
 		this.clazzToLog = clazzToLog;
@@ -49,7 +49,7 @@ public class ConsoleAppender implements Appender {
 				System.out.println(logPrefix + message);
 				return;
 			}
-			System.out.println(logPrefix + message + ": \n" + t.toString());
+			System.out.println(logPrefix + message + "\n" + t.toString());
 		}
 	}
 
