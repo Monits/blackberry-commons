@@ -65,7 +65,7 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public void debug(String eventData) {
-		Logger.logEvent(loggerName, Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData, null);
+		Logger.logEvent(loggerName, Logger.LEVEL_DEBUG, eventData, null);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Logger {
 	 * @param t The exception to log, including its stack trace.
 	 */
 	public void debug(String eventData, Throwable t) {
-		Logger.logEvent(loggerName, Logger.LEVEL_DEBUG, Logger.LOG_PREFIX_DEBUG + eventData, t);
+		Logger.logEvent(loggerName, Logger.LEVEL_DEBUG, eventData, t);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public void info(String eventData) {
-		Logger.logEvent(loggerName, Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData, null);
+		Logger.logEvent(loggerName, Logger.LEVEL_INFO, eventData, null);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class Logger {
 	 * @param t The exception to log, including its stack trace.
 	 */
 	public void info(String eventData, Throwable t) {
-		Logger.logEvent(loggerName, Logger.LEVEL_INFO, Logger.LOG_PREFIX_INFO + eventData, t);
+		Logger.logEvent(loggerName, Logger.LEVEL_INFO, eventData, t);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public void warn(String eventData) {
-		Logger.logEvent(loggerName, Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData, null);
+		Logger.logEvent(loggerName, Logger.LEVEL_WARNING, eventData, null);
 	}
 
 
@@ -109,7 +109,7 @@ public class Logger {
 	 * @param t The exception to log, including its stack trace.
 	 */
 	public void warn(String eventData, Throwable t) {
-		Logger.logEvent(loggerName, Logger.LEVEL_WARNING, Logger.LOG_PREFIX_WARN + eventData, t);
+		Logger.logEvent(loggerName, Logger.LEVEL_WARNING, eventData, t);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public void error(String eventData) {
-		Logger.logEvent(loggerName, Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData, null);
+		Logger.logEvent(loggerName, Logger.LEVEL_ERROR, eventData, null);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class Logger {
 	 * @param t The exception to log, including its stack trace.
 	 */
 	public void error(String eventData, Throwable t) {
-		Logger.logEvent(loggerName, Logger.LEVEL_ERROR, Logger.LOG_PREFIX_ERROR + eventData, t);
+		Logger.logEvent(loggerName, Logger.LEVEL_ERROR, eventData, t);
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class Logger {
 	 * @param eventData Message to log.
 	 */
 	public void severe(String eventData) {
-		Logger.logEvent(loggerName, Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData, null);
+		Logger.logEvent(loggerName, Logger.LEVEL_SEVERE_ERROR, eventData, null);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class Logger {
 	 * @param t The exception to log, including its stack trace.
 	 */
 	public void severe(String eventData, Throwable t) {
-		Logger.logEvent(loggerName, Logger.LEVEL_SEVERE_ERROR, Logger.LOG_PREFIX_SEVERE + eventData, t);
+		Logger.logEvent(loggerName, Logger.LEVEL_SEVERE_ERROR, eventData, t);
 	}
 
 	/**
