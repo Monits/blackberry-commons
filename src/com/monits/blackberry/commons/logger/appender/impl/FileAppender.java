@@ -91,7 +91,6 @@ public class FileAppender implements Appender {
 				fc.close();
 			} catch (IOException ioe) {
 				// Ignore it, we can't log it!
-				System.out.println(ioe.getMessage());
 			}
 		}
 	}
