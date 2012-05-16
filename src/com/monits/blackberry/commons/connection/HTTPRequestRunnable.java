@@ -41,7 +41,7 @@ import com.thirdparty.connectivity.NoMoreTransportsException;
  */
 public class HTTPRequestRunnable extends Object implements Runnable {
 
-	public static final Logger logger = Logger.getLogger(HTTPRequestRunnable.class);
+	public static final Logger logger = new Logger(HTTPRequestRunnable.class);
 
 	public static final int POST = 1;
 	public static final int GET = 2;

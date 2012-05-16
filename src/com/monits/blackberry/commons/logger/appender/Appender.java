@@ -23,14 +23,13 @@ package com.monits.blackberry.commons.logger.appender;
 public interface Appender {
 
 	/**
-	 * Log the event message and the info provided by the {@link Throwable} object.
+	 * Log the formatted message and the info provided by the {@link Throwable} object.
 	 * @param loggerName Logger instance name.
-	 * @param logPrefix logPrefix String representation of log level.
 	 * @param logLevel Log level.
-	 * @param message Proper event info
+	 * @param formatedMessage Message with a custom format.
 	 * @param t Exception to log, including it stack trace.
 	 */
-	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t);
+	public void logEvent(String loggerName, int logLevel, String formatedMessage, Throwable t);
 
 	/**
 	 * @return the minimumLogLevel

@@ -40,16 +40,15 @@ public class ConsoleAppender implements Appender {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.monits.blackberry.commons.logger.Appender#logEvent(int, java.lang.String, java.lang.Throwable)
+	 * @see com.monits.blackberry.commons.logger.appender.Appender#logEvent(java.lang.String, int, java.lang.String, java.lang.Throwable)
 	 */
-	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t) {
-
+	public void logEvent(String loggerName, int logLevel, String formatedMessage, Throwable t) {
 		if (DeviceInfo.isSimulator() && (minimumLogLevel >= logLevel) && loggerName.startsWith(clazzToLog)) {
 			if (t == null) {
-				System.out.println(logPrefix + message);
+				System.out.println(formatedMessage);
 				return;
 			}
-			System.out.println(logPrefix + message + "\n" + t.toString());
+			System.out.println(formatedMessage + "\n" + t.toString());
 		}
 	}
 
@@ -66,4 +65,5 @@ public class ConsoleAppender implements Appender {
 	public void setMinimumLogLevel(int minimumLogLevel) {
 		this.minimumLogLevel = minimumLogLevel;
 	}
+
 }

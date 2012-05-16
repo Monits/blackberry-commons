@@ -50,9 +50,9 @@ public class FileAppender implements Appender {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.monits.blackberry.commons.logger.Appender#logEvent(int, java.lang.String, java.lang.Throwable)
+	 * @see com.monits.blackberry.commons.logger.appender.Appender#logEvent(java.lang.String, int, java.lang.String, java.lang.Throwable)
 	 */
-	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t) {
+	public void logEvent(String loggerName, int logLevel, String formatedMessage, Throwable t) {
 		if ((minimumLogLevel >= logLevel) && loggerName.startsWith(clazzToLog)) {
 			try {
 				StringUtils su = new StringUtils();
@@ -82,9 +82,9 @@ public class FileAppender implements Appender {
 				OutputStream os = fc.openOutputStream(fc.fileSize());
 
 				if (t != null) {
-					os.write((logPrefix + message + "\n" + t.toString() + "\n").getBytes());
+					os.write((formatedMessage + "\n" + t.toString() + "\n").getBytes());
 				} else {
-					os.write((logPrefix + message + "\n").getBytes());
+					os.write((formatedMessage + "\n").getBytes());
 				}
 
 				os.close();

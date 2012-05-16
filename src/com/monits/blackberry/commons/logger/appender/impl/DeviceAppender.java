@@ -44,16 +44,15 @@ public class DeviceAppender implements Appender{
 	}
 
 	/* (non-Javadoc)
-	 * @see com.monits.blackberry.commons.logger.appender.Appender#logEvent(java.lang.String, java.lang.String, int, java.lang.String, java.lang.Throwable)
+	 * @see com.monits.blackberry.commons.logger.appender.Appender#logEvent(java.lang.String, int, java.lang.String, java.lang.Throwable)
 	 */
-	
-	public void logEvent(String loggerName, String logPrefix, int logLevel, String message, Throwable t) {
+	public void logEvent(String loggerName, int logLevel, String formatedMessage, Throwable t) {
 		if (minimumLogLevel >= logLevel && loggerName.startsWith(clazzToLog)) {
 			if (t == null) {
-				EventLogger.logEvent(guid, message.getBytes(), logLevel);
+				EventLogger.logEvent(guid, formatedMessage.getBytes(), logLevel);
 				return;
 			}
-			EventLogger.logEvent(guid, message.getBytes(), logLevel);
+			EventLogger.logEvent(guid, formatedMessage.getBytes(), logLevel);
 			EventLogger.logEvent(guid, t.toString().getBytes(), logLevel);
 		}
 	}
@@ -72,5 +71,4 @@ public class DeviceAppender implements Appender{
 		this.minimumLogLevel = logLevel;
 		EventLogger.setMinimumLevel(logLevel);
 	}
-
 }

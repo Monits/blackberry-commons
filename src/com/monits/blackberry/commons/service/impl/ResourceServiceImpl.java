@@ -109,7 +109,7 @@ public class ResourceServiceImpl implements ResourceService{
 		Resolution alternative = null;
 		for (int i = 0; i < alternatives.size(); i++) {
 			alternative = (Resolution) alternatives.elementAt(i);
-			encodedImage = EncodedImage.getEncodedImageResource(BITMAP_PATH + "/" + alternative.toString() + "/" + path);
+			encodedImage = EncodedImage.getEncodedImageResource(BITMAP_PATH + alternative.toString() + path);
 			if(encodedImage != null) {
 				break;
 			}
@@ -153,7 +153,7 @@ public class ResourceServiceImpl implements ResourceService{
 		 */
 		public String toString() {
 			if(width != 0 && height != 0) {
-				return width + "x" + height;
+				return width + "x" + height + "/";
 			}
 			return "";
 		}
