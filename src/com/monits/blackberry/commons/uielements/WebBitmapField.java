@@ -32,7 +32,7 @@ import com.monits.blackberry.commons.uielements.listener.StateChangeListener;
  */
 public class WebBitmapField extends BitmapField {
 
-	public static final Logger logger = new Logger(WebBitmapField.class);
+	public static final Logger logger = Logger.getLogger(WebBitmapField.class);
 
 	// TODO : Replace cache with a local persistent storage?
 	private static final Hashtable cache = new Hashtable();

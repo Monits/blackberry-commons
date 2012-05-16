@@ -74,12 +74,41 @@ public class Logger {
 	private String format;
 
 	/**
+	 * Return a Logger instance.
+	 * @param clazz Class to log.
+	 * @param format Format of the log messages.
+	 * <p><p> The format got 3 section: Date section, log level section and message section.
+	 * <p><p> To define a format use {@link Logger#MESSAGE_TOKEN}, {@link Logger#DATE_TOKEN} and {@link Logger#LOG_LEV_TOKEN}.
+	 * <p><p> The order of the parameters define the format of the log message.
+	 * <p><p> For example:
+	 * <p><p> "[SD],[DATE:dd/MM/yyyy],[MESSAGE]" will look like this "[D] [11/05/2012] I'm a message"
+	 * <p><p> "[MESSAGE],[SD],[DATE:dd/MM/yyyy]" will look like this " I'm a message [D] [11/05/2012]"
+	 * <p><p> "[LD],[DATE:dd/MM/yyyy],[MESSAGE]" will look like this "[DEBUG] [11/05/2012] I'm a message"
+	 * <p><p> "[MESSAGE],[DATE:dd/MM/yyyy],[LD]" will look like this "I'm a message [11/05/2012] [DEBUG]"
+	 * <p><p> And so on....
+	 * <p><p> For the date format expression see {@link SimpleDateFormat}
+	 */
+	public static Logger getLogger(Class clazz, String format) {
+		return new Logger(clazz, format);
+	}
+
+	/**
+	 * <p> Return a Logger instance.
+	 * <p><p> The format of the messages is the default 
+	 * "[LD],[DATE:dd/MM/yyyy HH:mm:ss:SS],[MESSAGE]". 
+	 * @param clazz Class to log.
+	 */
+	public static Logger getLogger(Class clazz) {
+		return new Logger(clazz);
+	}
+
+	/**
 	 * <p> Constructor. 
 	 * <p><p> The format of the messages is default. 
 	 * <p><p> [LD],[DATE:[dd/MM/yyyy HH:mm:ss:SS]],[MESSAGE]
 	 * @param clazz Class to log.
 	 */
-	public Logger(Class clazz){
+	private Logger(Class clazz){
 		this.loggerName = clazz.getName();
 		this.format = DEFAULT_FORMAT;
 	}
@@ -100,7 +129,7 @@ public class Logger {
 	 * <p><p> And so on....
 	 * <p><p> For the date format expression see {@link SimpleDateFormat}
 	 */
-	public Logger(Class clazz, String format){
+	private Logger(Class clazz, String format){
 		this.loggerName = clazz.getName();
 		this.format = format;
 	}
@@ -262,8 +291,16 @@ public class Logger {
 			} else if(arg.startsWith(Logger.DATE_TOKEN)) {
 				String dateFormat = arg.substring(Logger.DATE_TOKEN.length(), arg.length() - 1);
 				Date date = new Date();
-				SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormat);
-				formatedMessage += dateFormater.format(date) + " ";
+				if (!dateFormat.equals("")) {
+					SimpleDateFormat dateFormater = new SimpleDateFormat(dateFormat);
+					formatedMessage += dateFormater.format(date) + " ";
+				} else {
+					// If the pattern is empty apply the default date style.
+					SimpleDateFormat dateFormater = new SimpleDateFormat("[dd/MM/yyyy HH:mm:ss:SS]");
+					formatedMessage += dateFormater.format(date) + " ";
+				}
+			} else {
+				formatedMessage += arg + " ";
 			}
 		}
 
