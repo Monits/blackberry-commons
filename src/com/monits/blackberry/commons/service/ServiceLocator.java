@@ -29,7 +29,7 @@ import com.monits.blackberry.commons.service.impl.ScreenTypeServiceImpl;
  *
  */
 public class ServiceLocator {
-	private static Hashtable services;
+	protected static Hashtable services;
 
 	static {
 		services = new Hashtable();
