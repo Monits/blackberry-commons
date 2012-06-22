@@ -51,7 +51,7 @@ public class CustomPasswordEditField extends PasswordEditField {
 	}
 
 	public void paint(Graphics g){  
-		g.setColor(Color.LIGHTGRAY);
+		g.setColor(Color.LIGHTGREY);
 		g.drawLine(0, 0, getWidth(), 0);
 		g.drawLine(0, 1, getWidth(), 1);
 		
