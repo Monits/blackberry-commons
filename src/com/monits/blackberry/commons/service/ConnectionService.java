@@ -15,8 +15,6 @@
  */
 package com.monits.blackberry.commons.service;
 
-import net.rim.device.api.userauthenticator.UserAuthenticationException;
-
 import com.monits.blackberry.commons.service.request.RequestHandler;
 
 /**
@@ -31,7 +29,6 @@ public interface ConnectionService {
 	 * @param url The URL to POST
 	 * @param handler Object that will handle the response
 	 * @return The server response, or null in case of no response or error.
-	 * @throws UserAuthenticationException When the authentication process fails.
 	 */
 	public String executePost(String url, RequestHandler handler);
 
@@ -40,7 +37,6 @@ public interface ConnectionService {
 	 * @param url The URL to GET
 	 * @param handler Object that will handle the response
 	 * @return The server response, or null in case of no response or error.
-	 * @throws UserAuthenticationException
 	 */
 	public String executeGet(String url, RequestHandler handler);
 
