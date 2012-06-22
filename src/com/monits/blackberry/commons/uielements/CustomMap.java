@@ -1,3 +1,5 @@
+//#preprocess
+
 /*
  * Copyright 2012 Monits
  *
@@ -20,13 +22,16 @@ import javax.microedition.location.Coordinates;
 import net.rim.device.api.lbs.MapField;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Graphics;
+//#ifdef TouchEnabled
 import net.rim.device.api.ui.TouchEvent;
 import net.rim.device.api.ui.TouchGesture;
+//#endif
 import net.rim.device.api.ui.XYPoint;
 import net.rim.device.api.ui.XYRect;
 import net.rim.device.api.util.Arrays;
 import net.rim.device.api.util.MathUtilities;
 
+import com.monits.blackberry.commons.service.ServiceLocator;
 import com.monits.blackberry.commons.uielements.map.Marker;
 
 /**
@@ -35,6 +40,7 @@ import com.monits.blackberry.commons.uielements.map.Marker;
  */
 public class CustomMap extends MapField {
 
+	private Marker openLocation;
 	private Marker focusLocation;
 	private Marker markers[];
 
@@ -84,12 +90,12 @@ public class CustomMap extends MapField {
 
 	protected void paint(Graphics graphics) {
 		super.paint(graphics);
-		
+
 		XYPoint actualFieldOut = new XYPoint();
 		Coordinates actualCord = new Coordinates(((double) getLatitude()) / 100000.0, ((double) getLongitude()) / 100000.0, 0);
 		convertWorldToField(actualCord, actualFieldOut);
 		focusLocation = null;
-		
+
 		for (int i = 0; i < markers.length; i++) {
 			XYRect rect = null;
 			Marker loc = markers[i];
@@ -117,10 +123,19 @@ public class CustomMap extends MapField {
 			}
 		}
 
+		if (openLocation != null) {
+			drawOpenMarker(graphics, openLocation);
+		}
+
 		// Display the crosshair
 		if (crosshair != null) {
 			graphics.drawBitmap(this.getWidth() / 2 - crosshair.getWidth() / 2, this.getHeight() / 2 - crosshair.getHeight() / 2, crosshair.getWidth(), crosshair.getHeight(), crosshair, 0, 0);
 		}
+	}
+
+	protected void drawOpenMarker(Graphics graphics, Marker location) {
+		// Implement this if you want to draw a description or whatever.
+		// By default it doesn't do anything.
 	}
 
 	/**
@@ -152,7 +167,7 @@ public class CustomMap extends MapField {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -160,7 +175,7 @@ public class CustomMap extends MapField {
 	 * @return True if a marker is open, otherwise false 
 	 */
 	protected boolean isMarkerOpen() {
-		return false;
+		return openLocation != null;
 	}
 
 	/**
@@ -168,6 +183,21 @@ public class CustomMap extends MapField {
 	 * @param loc Marker to be open.
 	 */
 	public void openMarker(Marker loc) {
+		openLocation = loc;
+		if (null != loc) {
+			XYPoint fieldOut = new XYPoint();
+			Coordinates worldOut = new Coordinates((float) 0.0, (float) 0.0, (float) 0.0);
+			convertWorldToField(new Coordinates(loc.getCoor().getLatitude(), loc.getCoor().getLongitude(), (float) 0.0), fieldOut);
+			int newY = fieldOut.y - openLocation.getBitmap().getHeight() - ServiceLocator.getScreenTypeService().getNewSize(15);
+			convertFieldToWorld(new XYPoint(fieldOut.x, newY), worldOut);
+			moveTo(worldOut);
+		} else {
+			this.invalidate();
+		}
+	}
+
+	public Marker getOpenLocation() {
+		return openLocation;
 	}
 
 	//#ifdef TouchEnabled
